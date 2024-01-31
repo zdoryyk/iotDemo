@@ -1,5 +1,9 @@
 package com.iot.iotDemo;
 
+import com.iot.iotDemo.service.BlindService;
+import com.iot.iotDemo.singleton.BlindsState;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +22,11 @@ import org.springframework.messaging.MessageHandler;
 import java.util.Objects;
 
 @Configuration
+@Slf4j
+@AllArgsConstructor
 public class MqttBeans {
+
+    private final BlindService blindService;
 
     public MqttPahoClientFactory mqttPahoClientFactory(){
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
@@ -39,7 +47,7 @@ public class MqttBeans {
     @Bean
     public MessageProducer inbound() {
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter("serverIn",
-                mqttPahoClientFactory(), "temperature");
+                mqttPahoClientFactory(), "light_sensor","state_blinds");
 
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
@@ -53,8 +61,11 @@ public class MqttBeans {
     public MessageHandler handler(){
         return message -> {
             String topic = Objects.requireNonNull(message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC)).toString();
-            if(topic.equals("sensor/me")){
-                System.out.println("This is out Topic");
+            if(topic.equals("state_blinds")){
+                log.info("Blinds state update");
+                blindService.setBlindsLengthToSingleton(Integer.parseInt(message.getPayload().toString()));
+            }if(topic.equals("light_sensor")){
+                log.info("Light sensor update");
             }
             System.out.println(topic);
             System.out.println(message.getPayload());
