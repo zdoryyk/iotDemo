@@ -1,6 +1,5 @@
 package com.iot.iotDemo.singleton;
 
-import com.iot.iotDemo.service.BlindService;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -11,10 +10,12 @@ public class BlindsState {
     private static BlindsState instance;
     private Integer length;
     private Boolean isAdaptive;
+    private Integer illuminance;
 
     private BlindsState (){
         this.length = 0;
         isAdaptive = false;
+        this.illuminance = 0;
     }
 
     public static synchronized BlindsState getInstance(){

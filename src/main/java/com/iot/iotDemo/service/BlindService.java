@@ -5,6 +5,7 @@ import com.iot.iotDemo.singleton.BlindsState;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,7 +43,14 @@ public class BlindService {
         return (int) (Math.round(number / 10.0) * 10);
     }
 
-    public void setBlindsLengthIfIsAdaptive(int length){
+    public void setBlindsLengthIfIsAdaptive(int illuminate){
+        BlindsState.getInstance().setIlluminance(illuminate);
+        log.info("Illuminate was updated");
+    }
+    @Scheduled(fixedDelay = 2 * 60 *1000)
+    public void makeAdaptive(){
+        log.info("I'm here");
+        int length = BlindsState.getInstance().getIlluminance();
         if(BlindsState.getInstance().getIsAdaptive()){
             if(length < 8000){
                 int currentState = BlindsState.getInstance().getLength();
@@ -62,4 +70,5 @@ public class BlindService {
             }
         }
     }
+
 }
