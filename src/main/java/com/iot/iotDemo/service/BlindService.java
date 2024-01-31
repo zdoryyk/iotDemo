@@ -3,11 +3,13 @@ package com.iot.iotDemo.service;
 import com.iot.iotDemo.MqttGateway;
 import com.iot.iotDemo.singleton.BlindsState;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class BlindService {
     private final MqttGateway mqttGateway;
 
@@ -46,14 +48,17 @@ public class BlindService {
                 int currentState = BlindsState.getInstance().getLength();
                 int steps = 13500 - currentState;
                 setBlindsStatus(steps/270);
+                log.info(Integer.toString(steps/270));
             } else if (length < 12000 && length > 8000) {
                 int currentState = BlindsState.getInstance().getLength();
                 int steps = 18900 - currentState;
                 setBlindsStatus(steps/270);
+                log.info(Integer.toString(steps/270));
             } else if(length > 12000){
                 int currentState = BlindsState.getInstance().getLength();
                 int steps = 27000 - currentState;
                 setBlindsStatus(steps/270);
+                log.info(Integer.toString(steps/270));
             }
         }
     }

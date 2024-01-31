@@ -65,7 +65,7 @@ public class MqttBeans {
             if(topic.equals("state_blinds")){
                 log.info("Blinds state update");
                 blindService.setBlindsLengthToSingleton(Integer.parseInt(message.getPayload().toString()));
-            }if(topic.equals("gateway/zigbee/light_sensor")){
+            }if(topic.contains("gateway/zigbee/light_sensor")){
                 log.info("Light sensor update");
                 JSONObject obj = new JSONObject(message.getPayload().toString());
                 int illuminance = obj.getInt("illuminance");
