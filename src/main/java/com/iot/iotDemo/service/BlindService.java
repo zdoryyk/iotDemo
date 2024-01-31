@@ -15,7 +15,7 @@ public class BlindService {
 
     public ResponseEntity<?> setBlindsStatus(Integer length){
         try {
-            mqttGateway.sendToMqtt(Integer.toString(length * 270),"blinds");
+            mqttGateway.sendToMqtt(Integer.toString(length * 150),"blinds");
             return ResponseEntity.ok("Success");
         }catch (Exception e){
             return ResponseEntity.ok("fail");
@@ -31,7 +31,7 @@ public class BlindService {
     }
 
     public Integer getLength(){
-        return roundToNearestTen(BlindsState.getInstance().getLength() / 270);
+        return roundToNearestTen(BlindsState.getInstance().getLength() / 150);
     }
 
     public void setBlindsLengthToSingleton(Integer length){
@@ -42,24 +42,20 @@ public class BlindService {
         return (int) (Math.round(number / 10.0) * 10);
     }
 
-    public void setBlindsLengthIfIsAdaptive(int length){
+    public void setBlindsLengthIfIsAdaptive(int illuminate){
         if(BlindsState.getInstance().getIsAdaptive()){
-            if(length < 8000){
-                int currentState = BlindsState.getInstance().getLength();
-                int steps = 13500 - currentState;
-                setBlindsStatus(steps/270);
-                log.info(Integer.toString(steps/270));
-            } else if (length < 12000 && length > 8000) {
-                int currentState = BlindsState.getInstance().getLength();
-                int steps = 18900 - currentState;
-                setBlindsStatus(steps/270);
-                log.info(Integer.toString(steps/270));
-            } else if(length > 12000){
-                int currentState = BlindsState.getInstance().getLength();
-                int steps = 27000 - currentState;
-                setBlindsStatus(steps/270);
-                log.info(Integer.toString(steps/270));
+            int percent = roundToNearestTen(numberOfPercentFromIlluminate(illuminate));
+            int currentState = BlindsState.getInstance().getLength() / 150;
+            if(percent > currentState){
+                setBlindsStatus((percent -currentState) *150);
+            }else if (percent < currentState){
+                setBlindsStatus((currentState - percent) *150);
             }
         }
+    }
+
+    public int numberOfPercentFromIlluminate(int illuminate){
+        int result = illuminate /250;
+        return Math.min(result, 100);
     }
 }
