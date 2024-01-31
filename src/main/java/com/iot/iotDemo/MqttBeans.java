@@ -5,6 +5,7 @@ import com.iot.iotDemo.singleton.BlindsState;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.json.JSONObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -47,7 +48,7 @@ public class MqttBeans {
     @Bean
     public MessageProducer inbound() {
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter("serverIn",
-                mqttPahoClientFactory(), "light_sensor","state_blinds");
+                mqttPahoClientFactory(), "gateway/zigbee/light_sensor","state_blinds");
 
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
@@ -64,8 +65,11 @@ public class MqttBeans {
             if(topic.equals("state_blinds")){
                 log.info("Blinds state update");
                 blindService.setBlindsLengthToSingleton(Integer.parseInt(message.getPayload().toString()));
-            }if(topic.equals("light_sensor")){
+            }if(topic.equals("gateway/zigbee/light_sensor")){
                 log.info("Light sensor update");
+                JSONObject obj = new JSONObject(message.getPayload().toString());
+                int illuminance = obj.getInt("illuminance");
+                blindService.setBlindsLengthIfIsAdaptive(illuminance);
             }
             System.out.println(topic);
             System.out.println(message.getPayload());

@@ -39,4 +39,22 @@ public class BlindService {
     private static int roundToNearestTen(int number) {
         return (int) (Math.round(number / 10.0) * 10);
     }
+
+    public void setBlindsLengthIfIsAdaptive(int length){
+        if(BlindsState.getInstance().getIsAdaptive()){
+            if(length < 8000){
+                int currentState = BlindsState.getInstance().getLength();
+                int steps = 13500 - currentState;
+                setBlindsStatus(steps/270);
+            } else if (length < 12000 && length > 8000) {
+                int currentState = BlindsState.getInstance().getLength();
+                int steps = 18900 - currentState;
+                setBlindsStatus(steps/270);
+            } else if(length > 12000){
+                int currentState = BlindsState.getInstance().getLength();
+                int steps = 27000 - currentState;
+                setBlindsStatus(steps/270);
+            }
+        }
+    }
 }
